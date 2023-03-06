@@ -1,38 +1,71 @@
-# {{param "name" (param "github.repo") "What is your project name?" | titlecase}}
+# Merge JSON from GitHub CLI
 
-{{if (param "badges" true "Do you need badges?") -}}
-[![releases](https://img.shields.io/github/v/release/{{param "github.owner"}}/{{param "github.repo"}}.svg?logo=github)](https://github.com/{{param "github.owner"}}/{{param "github.repo"}}/releases/latest)
-[![reference](https://pkg.go.dev/badge/github.com/{{param "github.owner"}}/{{param "github.repo"}}.svg)](https://pkg.go.dev/github.com/{{param "github.owner"}}/{{param "github.repo"}})
-[![ci](https://github.com/{{param "github.owner"}}/{{param "github.repo"}}/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/{{param "github.owner"}}/{{param "github.repo"}}/actions/workflows/ci.yml)
-{{- end -}}
+A [GitHub CLI](https://github.com/cli/cli) to merge JSON responses to return valid JSON when passing `--paginate` to `gh api`:
 
-<!-- {{if 0}} -->
-To create a new repository from this template repository for Go projects,
-using the [GitHub CLI](https://github.com/cli/cli) run:
-
-```bash
-gh extension install heaths/gh-template
-gh template clone <name> --template heaths/template-golang --public
-
-# Recommended
-cd <name>
-git commit -a --amend
+```powershell
+$issues = gh api repos/{owner}/{repo}/issues --paginate | gh merge-json | ConvertFrom-Json
 ```
 
-The `gh template` command will:
+## Install
 
-1. Create a new repository with the given `<name>` on GitHub.
-2. Copy the `heaths/template-golang` files into that repo.
-3. Clone the new repository into a directory named `<name>` in the current directory.
-4. Apply built-in and passed parameters, or prompt for undefined parameters, to format template files.
+Make sure you have version 2.0 or [newer](https://github.com/cli/cli/releases/latest) of the GitHub CLI installed.
 
-This will create a new repo with the given `<name>` in GitHub, copy the
-`heaths/template-golang` files into that repo, and clone it into a
-subdirectory of the current directory named `<name>`.
+```bash
+gh extension install heaths/gh-merge-json
+```
 
-See [heaths/gh-template](https://github.com/heaths/gh-template) for more information
-about this GitHub CLI extension.
-<!-- {{end}} -->
+## Details
+
+The GitHub CLI can return paginated JSON responses from both REST and GraphQL APIs;
+however, due to bug [#1268](https://github.com/cli/cli/issues/1268) when `--paginate` is passed to `gh api` it does not
+return value JSON:
+
+```json
+{
+  "data": {
+    "viewer": {
+      "repositories": {
+        "nodes": [
+          {
+            "nameWithOwner": "owner/repo1"
+          },
+          {
+            "nameWithOwner": "owner/repo2"
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpHOBAaq0A=="
+        }
+      }
+    }
+  }
+}
+{
+  "data": {
+    "viewer": {
+      "repositories": {
+        "nodes": [
+          {
+            "nameWithOwner": "owner/repo3"
+          },
+          {
+            "nameWithOwner": "owner/repo4"
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpHOBzdvuQ=="
+        }
+      }
+    }
+  }
+}
+```
+
+Until [PR #5652](https://github.com/cli/cli/pull/5652) or some other solution is merged, you can use this extension
+without having to install additional system utilities like `jq` which may not be available for your platform or
+otherwise difficult to obtain e.g., requiring a bunch of prerequisites.
 
 ## License
 
