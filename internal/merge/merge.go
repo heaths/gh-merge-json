@@ -1,23 +1,15 @@
 package merge
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
 
-	"github.com/cli/go-gh/pkg/jsonpretty"
 	"github.com/imdario/mergo"
 )
 
-func MergeJSON(r io.Reader, w io.Writer, tty bool) error {
-	indent := ""
-	if tty {
-		indent = "  "
-	}
-
+func MergeJSON(r io.Reader) ([]byte, error) {
 	var merged interface{}
-
 	dec := json.NewDecoder(r)
 	for dec.More() {
 		var data json.RawMessage
@@ -25,27 +17,21 @@ func MergeJSON(r io.Reader, w io.Writer, tty bool) error {
 		// Consume the entire token.
 		err := dec.Decode(&data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		buf, err := data.MarshalJSON()
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		err = merge(&merged, buf)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	buf, err := json.Marshal(merged)
-	if err != nil {
-		return err
-	}
-
-	r = bytes.NewBuffer(buf)
-	return jsonpretty.Format(w, r, indent, tty)
+	return json.Marshal(merged)
 }
 
 func merge(dst *interface{}, buf []byte) error {
