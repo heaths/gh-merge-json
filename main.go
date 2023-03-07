@@ -5,9 +5,11 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 
+	"github.com/cli/go-gh/pkg/jsonpretty"
 	"github.com/cli/go-gh/pkg/term"
 	"github.com/heaths/gh-merge-json/internal/merge"
 )
@@ -20,9 +22,20 @@ func main() {
 	}
 
 	r := bufio.NewReader(t.In())
-	err := merge.MergeJSON(r, t.Out(), t.IsColorEnabled())
+	b, err := merge.MergeJSON(r)
 	if err != nil {
 		fmt.Fprintf(t.ErrOut(), "failed to merge JSON: %s\n", err)
+		os.Exit(1)
+	}
+
+	if t.IsTerminalOutput() {
+		buf := bytes.NewBuffer(b)
+		err = jsonpretty.Format(t.Out(), buf, "  ", t.IsColorEnabled())
+	} else {
+		_, err = t.Out().Write(b)
+	}
+	if err != nil {
+		fmt.Fprintf(t.ErrOut(), "failed to format JSON: %s\n", err)
 		os.Exit(1)
 	}
 }

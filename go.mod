@@ -3,7 +3,6 @@ module github.com/heaths/gh-merge-json
 go 1.18
 
 require (
-	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cli/go-gh v1.2.1
 	github.com/imdario/mergo v0.3.13
 	github.com/stretchr/testify v1.8.2
