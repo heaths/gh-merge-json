@@ -3,7 +3,7 @@
 A [GitHub CLI](https://github.com/cli/cli) to merge JSON responses to return valid JSON when passing `--paginate` to `gh api`:
 
 ```powershell
-$issues = gh api repos/{owner}/{repo}/issues --paginate | gh merge-json | ConvertFrom-Json
+$issues = gh api 'repos/{owner}/{repo}/issues' --paginate | gh merge-json | ConvertFrom-Json
 ```
 
 ## Install
