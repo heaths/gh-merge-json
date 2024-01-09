@@ -35,7 +35,9 @@ func init() {
 }
 
 func main() {
-	cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
 
 func run(_ *cobra.Command, _ []string) error {
