@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 )
 
 var (
