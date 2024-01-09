@@ -70,6 +70,16 @@ func TestMerge(t *testing.T) {
 				]`,
 			want: `[{"a":1,"b":"foo"},{"a":2,"b":"bar"},{"a":2,"b":"baz"},{"a":3,"b":"qux"}]`,
 		},
+		{
+			name:    "invalid JSON",
+			in:      `invalid JSON`,
+			wantErr: true,
+		},
+		{
+			name:    "invalid token",
+			in:      `1234 invalid`,
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
