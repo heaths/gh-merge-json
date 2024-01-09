@@ -8,6 +8,10 @@ import (
 	"github.com/imdario/mergo"
 )
 
+var (
+	errInvalidJSON = errors.New("invalid JSON")
+)
+
 func MergeJSON(r io.Reader) ([]byte, error) {
 	var merged interface{}
 	dec := json.NewDecoder(r)
@@ -48,6 +52,8 @@ func merge(dst *interface{}, buf []byte) error {
 			*dst = new([]interface{})
 		}
 		v = new([]interface{})
+	} else {
+		return errInvalidJSON
 	}
 
 	err := json.Unmarshal(buf, &v)
