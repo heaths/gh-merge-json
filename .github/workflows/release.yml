@@ -13,7 +13,7 @@ defaults:
     shell: bash
 
 env:
-  GOVERSION: "1.19"
+  GOVERSION: "1.21"
 
 jobs:
   test:
